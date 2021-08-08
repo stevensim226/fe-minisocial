@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-KyZXEAg3QhqLMpG8r+8fhAXLRk2vvoC2f3B09zVXn8CA5QIVfZOJ3BCsw2P0p/We" crossorigin="anonymous">
+    <title>Mini Social</title>
+
+    <!-- JQuery -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+</head>
+<body class="bg-info">
+    <nav class="navbar navbar-light bg-primary p-3">
+        <h3 class="m-0 text-light">Mini Social Media</h3>
+    </nav>
+
+    <div id="comment-holder" class="container vh-100 d-flex flex-column align-items-center">
+        <div class="vh-25 w-100 bg-light mt-3 row">
+
+            <div class="col-sm-12 col-md-2 bg-secondary d-flex justify-content-center align-items-center">
+                <img id="pfp" class="h-75 w-75 img-thumbnail" src="https://t4.ftcdn.net/jpg/00/64/67/63/360_F_64676383_LdbmhiNM6Ypzb3FM4PPuFP9rHe7ri8Ju.jpg">
+            </div>
+
+            <div class="col-sm-12 col-md-10 p-2 d-flex flex-column justify-content-around">
+                <h4 id="name">Title goes here</h4>
+                <p id="created_at">Posted on 8-8-2021</p>
+                <p class="bg-secondary text-light p-2" id="content">Good morning everyone</p>
+
+                <p class="mb-3" id="comment_count"><u>10 Comments</u><p>
+                <a id="edit-btn" class="btn btn-info">Edit</a>
+                <a id="delete-btn" class="btn btn-danger">Delete</a>
+            </div>
+        </div>
+
+        <div class="bg-light w-100 mt-2 p-1">
+            <h6 class="m-0">Post a new comment</h6>
+            <input class="w-75" type="text">
+            <button>Post</button>
+        </div>
+    </div>
+
+
+</body>
+<script>
+    $(document).ready(function(){
+        $.get("http://localhost:3000/status/{{ status_uuid }}", (res) => {
+            $("#pfp").attr("src", res.content["pfp_url"])
+            $("#name").text(`Posted by ${res.content["name"]}`)
+            $("#created_at").text(`Posted at ${res.content["created_at"].substring(0,10)}`)
+            $("#content").text(res.content["content"])
+            $("#comment_count").text(`${res.content["comment_count"]} comments`)
+
+            for (comment of res.content["comments"]) {
+                $("#comment-holder").append(
+                    `
+                        <div class="bg-light w-100 mt-2 p-1">
+                            <h6 class="m-0 d-inline">Posted on ${comment["created_at"].substring(0,10)}</h6>
+                                <p class="m-0 bg-secondary text-light p-1">${comment["content"]}</p>
+                            <button comment_id="${comment["id"]}" id="delete-comment" class="btn btn-danger mt-1">Delete</button>
+                        </div>
+                    `
+                )
+            }
+        })
+
+        $("#delete-comment").click((e) => {
+                $.ajax( `http://localhost:3000/comment/${$(e.target).attr("comment_id")}`, {
+                    type : 'DELETE'
+                }).done(
+                    () => {
+                        location.reload()
+                    }
+                )
+        })
+
+        $("#delete-btn").click((e) => {
+            $.ajax( `http://localhost:3000/status/{{ status_uuid }}`, {
+                type : 'DELETE'
+            }).done(
+                () => {
+                    window.location.replace("/")
+                }
+            )
+        })
+
+        $("#edit-btn").click((e) => {
+            window.location.replace("/edit/{{ status_uuid }}")
+        })
+    });
+</script>
+</html>
