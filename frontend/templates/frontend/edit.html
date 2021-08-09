@@ -12,7 +12,9 @@
 </head>
 <body class="bg-info">
     <nav class="navbar navbar-light bg-primary p-3">
-        <h3 class="m-0 text-light">Mini Social Media</h3>
+        <a href="/">
+            <h3 class="m-0 text-light">Mini Social Media</h3>
+        </a>
     </nav>
 
     <div class="container vh-100 d-flex flex-column align-items-center">
@@ -36,7 +38,7 @@
 </body>
 <script>
     $(document).ready(function(){
-        $.get("http://localhost:3000/status/{{ status_uuid }}", (res) => {
+        $.get("{{ backend_url }}/status/{{ status_uuid }}", (res) => {
             $("#name").val(res.content["name"])
             $("#content").val(res.content["content"])
             $("#pfp_url").val(res.content["pfp_url"])
@@ -44,7 +46,7 @@
     });
 
     $("#save-btn").click(() => {
-        $.ajax("http://localhost:3000/status/{{ status_uuid }}", {
+        $.ajax("{{ backend_url }}/status/{{ status_uuid }}", {
             type : 'PUT',
             data: {
                 name: $("#name").val(),

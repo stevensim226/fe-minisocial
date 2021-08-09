@@ -12,7 +12,9 @@
 </head>
 <body class="bg-info">
     <nav class="navbar navbar-light bg-primary p-3">
-        <h3 class="m-0 text-light">Mini Social Media</h3>
+        <a href="/">
+            <h3 class="m-0 text-light">Mini Social Media</h3>
+        </a>
     </nav>
 
     <div id="comment-holder" class="container vh-100 d-flex flex-column align-items-center">
@@ -35,8 +37,8 @@
 
         <div class="bg-light w-100 mt-2 p-1">
             <h6 class="m-0">Post a new comment</h6>
-            <input class="w-75" type="text">
-            <button>Post</button>
+            <input id="comment-content" class="w-75" type="text">
+            <button id="comment-btn">Post</button>
         </div>
     </div>
 
@@ -44,7 +46,7 @@
 </body>
 <script>
     $(document).ready(function(){
-        $.get("http://localhost:3000/status/{{ status_uuid }}", (res) => {
+        $.get("{{ backend_url }}/status/{{ status_uuid }}", (res) => {
             $("#pfp").attr("src", res.content["pfp_url"])
             $("#name").text(`Posted by ${res.content["name"]}`)
             $("#created_at").text(`Posted at ${res.content["created_at"].substring(0,10)}`)
@@ -64,18 +66,20 @@
             }
         })
 
-        $("#delete-comment").click((e) => {
-                $.ajax( `http://localhost:3000/comment/${$(e.target).attr("comment_id")}`, {
-                    type : 'DELETE'
+        $("body").click((e) => {
+            if ($(e.target).attr("id") === "delete-comment") {
+                $.ajax( `{{ backend_url }}/comment/${$(e.target).attr("comment_id")}`, {
+                type : 'DELETE'
                 }).done(
                     () => {
                         location.reload()
                     }
                 )
+            }
         })
 
         $("#delete-btn").click((e) => {
-            $.ajax( `http://localhost:3000/status/{{ status_uuid }}`, {
+            $.ajax( `{{ backend_url }}/status/{{ status_uuid }}`, {
                 type : 'DELETE'
             }).done(
                 () => {
@@ -86,6 +90,14 @@
 
         $("#edit-btn").click((e) => {
             window.location.replace("/edit/{{ status_uuid }}")
+        })
+
+        $("#comment-btn").click((e) => {
+            $.post("{{ backend_url }}/comment/{{ status_uuid }}", {
+                content: $("#comment-content").val()
+            }).done(
+                location.reload()
+            )
         })
     });
 </script>

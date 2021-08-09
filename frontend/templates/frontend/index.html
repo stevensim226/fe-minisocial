@@ -12,7 +12,9 @@
 </head>
 <body class="bg-info">
     <nav class="navbar navbar-light bg-primary p-3">
-        <h3 class="m-0 text-light">Mini Social Media</h3>
+        <a href="/">
+            <h3 class="m-0 text-light">Mini Social Media</h3>
+        </a>
     </nav>
 
     <div id="status-container" class="container vh-100 d-flex flex-column align-items-center">
@@ -22,11 +24,11 @@
             </div>
 
             <div class="col-sm-12 col-md-10 p-2 d-flex flex-column justify-content-around">
-                <input type="text" placeholder="Your name">
+                <input id="name" type="text" placeholder="Your name">
 
-                <input type="text" placeholder="What's on your mind today?">
-                <input type="link" placeholder="Picture URL">
-                <button class="btn btn-primary">Post new status update</button>
+                <input id="content" type="text" placeholder="What's on your mind today?">
+                <input id="pfp_url" type="link" placeholder="Picture URL">
+                <button id="post-btn" class="btn btn-primary">Post new status update</button>
 
             </div>
         </div>
@@ -36,7 +38,7 @@
 </body>
 <script>
     $(document).ready(function(){
-        $.get("http://localhost:3000/status/", (res) => {
+        $.get("{{ backend_url }}/status/", (res) => {
             console.log(res)
             for (idx in res) {
                 $("#status-container").append(`
@@ -53,6 +55,17 @@
                 </div>
                 `)
             }
+        })
+
+        $("#post-btn").click((e) => {
+            $.post("{{ backend_url }}/status/", {
+                name: $("#name").val(),
+                content: $("#content").val(),
+                pfp_url: $("#pfp_url").val()
+            }).done(
+                window.location.replace("/")
+            )
+            
         })
     });
 </script>
